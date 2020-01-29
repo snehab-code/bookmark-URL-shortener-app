@@ -14,13 +14,47 @@ module.exports.list = (req, res) => {
 
 module.exports.show = (req, res) => {
     const id = req.params.id
-    Bookmark. findById(id)
+    Bookmark.findById(id)
         .then(bookmark => {
             res.json(bookmark)
         })
         .catch(err => {
             res.json(err)
         })
+}
+
+module.exports.listByTag = (req, res) => {
+    const name = req.params.name
+    Bookmark.find({tags: name})
+        .then(bookmarks => {
+            if (bookmarks) {
+                res.json(bookmarks)
+            } else {
+                res.json([])
+            }
+        })
+        .catch(err => {
+            res.json(err)
+        })
+}
+
+module.exports.listByTags = (req, res) => {
+    if (req.query.names) {
+        const tagsArray = req.query.names.split(',')
+        Bookmark.find({tags: {'$in': tagsArray}})
+            .then(bookmarks => {
+                if (bookmarks) {
+                    res.json(bookmarks)
+                } else {
+                    res.json([])
+                }
+            })
+            .catch(err => {
+                res.json(err)
+            })
+    } else {
+        res.json([])
+    }
 }
 
 module.exports.create = (req, res) => {
